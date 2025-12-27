@@ -5,15 +5,14 @@ A lightweight, aesthetic Bash pipeline designed to automate the configuration of
 ### ⚡ Quick Execution (Recommended)
 This method uses a lightweight wrapper to fetch the latest release and run it immediately.
 
-~~~
+```bash
 curl -sSL https://gist.githubusercontent.com/BenignPigeon/64cde9ef0cf255a56d0d76c1e0f327b4/raw/linux-mint-setup.sh | bash
-
-~~~
+```
 
 ### 🛠️ Manual Alternative
 Use this method if you prefer to download and extract the release files into a temporary directory before running.
 
-```
+```bash
 mkdir -p /tmp/mint-setup && \
 curl -s https://api.github.com/repos/BenignPigeon/LinuxMint-Setup-Script/releases/latest \
 | grep "browser_download_url.*zip" \
@@ -41,3 +40,4 @@ linuxsetup/
     ├── 01-update.sh  # Example: System updates
     ├── 02-apps.sh    # Example: Software installation
     └── 03-config.sh  # Example: Desktop environment tweaks
+```
