@@ -3,12 +3,17 @@
 # 1. Path Anchoring
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Self-Elevation 
+if [[ $EUID -ne 0 ]]; then
+    echo -e "${CYAN}🔐 Requesting administrative privileges...${NC}"
+    # This finds the absolute path so it never gets lost
+    SCRIPT_PATH=$(readlink -f "$0")
+    exec sudo bash "$SCRIPT_PATH" "$@"
+fi
+
 # 2. Define Jobs: "Display Name | Script Path"
 JOBS=(
-    "System Update|bin/test1.sh"
-    "Database Migration|bin/test2.sh"
-    "Cleanup Task|bin/test3.sh"
-    "Final Polish|bin/test4.sh"
+    "System Update and Backup|bin/backup1.sh"
 )
 
 # Color Palette
