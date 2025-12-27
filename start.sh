@@ -13,7 +13,9 @@ fi
 
 # 2. Define Jobs: "Display Name | Script Path"
 JOBS=(
-    "System Update and Backup|bin/backup1.sh"
+    # "System Update and Backup|bin/backup1.sh"
+    # "Multimedia Codec Install|bin/codec-check.sh"
+    "Test|bin/test1.sh"
 )
 
 # Color Palette
