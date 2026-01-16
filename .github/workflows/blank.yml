@@ -1,10 +1,12 @@
-name: Create Beta Pre-Release
+name: Create Nightly Pre-Release
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # Optional: Runs automatically every night at midnight UTC
 
 jobs:
   build-and-release:
@@ -15,43 +17,27 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Zip Repository
         run: |
           zip -r LinuxMint-Setup-Script.zip . -x "*.git*" ".github*"
 
-      - name: Determine Next Beta Version
+      - name: Set Nightly Version
         id: versioning
         run: |
-          # Get latest tag or default
-          LATEST_TAG=$(git tag --sort=-v:refname | head -n1)
-          if [ -z "$LATEST_TAG" ]; then LATEST_TAG="v1.0.0"; fi
-          
-          if [[ "$LATEST_TAG" =~ -beta\.([0-9]+)$ ]]; then
-            # Increment existing beta number
-            VERSION_BASE="${LATEST_TAG%-beta.*}"
-            BETA_NUMBER="${BASH_REMATCH[1]}"
-            NEXT_BETA=$((BETA_NUMBER + 1))
-            NEW_TAG="${VERSION_BASE}-beta.${NEXT_BETA}"
-          else
-            # Increment patch for new beta cycle (e.g., 1.0 -> v1.0.1-beta.1)
-            CLEAN_TAG=${LATEST_TAG#v}
-            # Handles X.Y or X.Y.Z formats
-            NEXT_VERSION=$(echo $CLEAN_TAG | awk -F. '{if (NF==1) print $1".0.1"; else if (NF==2) print $1"."$2".1"; else {$NF = $NF + 1; print $0}}' OFS=.)
-            NEW_TAG="v${NEXT_VERSION}-beta.1"
-          fi
+          # Create a tag based on the current date
+          TAG_DATE=$(date +'%Y.%m.%d')
+          echo "tag_name=nightly-$TAG_DATE" >> $GITHUB_OUTPUT
+          echo "display_date=$(date +'%B %d, %Y')" >> $GITHUB_OUTPUT
 
-          echo "tag_name=$NEW_TAG" >> $GITHUB_OUTPUT
-
-      - name: Delete Old Beta Releases
+      - name: Delete Old Nightly Releases
         run: |
-          # Fetch all releases, filter for those marked as "prerelease", and delete them
-          # This keeps the UI clean so only the latest beta exists.
-          gh release list --limit 100 | grep "Pre-release" | awk '{print $1}' | while read -r tag; do
-            echo "Deleting old pre-release: $tag"
-            gh release delete "$tag" --yes --cleanup-tag
+          # 1. Get the IDs/Tags of all releases marked as 'Pre-release'
+          # 2. Delete them to keep only the newest one
+          # Using 'gh release list' and filtering for the 'Pre-release' label
+          gh release list --limit 50 | grep -i "Pre-release" | awk '{print $1}' | while read -r old_tag; do
+            echo "Removing old nightly: $old_tag"
+            gh release delete "$old_tag" --yes --cleanup-tag
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,7 +46,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.versioning.outputs.tag_name }}
-          name: "Pre-release ${{ steps.versioning.outputs.tag_name }}"
+          name: "Nightly Build (${{ steps.versioning.outputs.display_date }})"
+          body: |
+            This is an automated nightly build of the Linux Mint Setup Script.
+            **Built on:** ${{ steps.versioning.outputs.display_date }}
+            
+            *Note: This release is updated daily. Older nightlies are automatically removed.*
           prerelease: true
           files: LinuxMint-Setup-Script.zip
           generate_release_notes: true
