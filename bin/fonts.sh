@@ -17,6 +17,23 @@ sudo add-apt-repository multiverse
 
 echo "🚀 Starting font installation (Unattended Mode)..."
 
+# ----------------------------
+# Import fonts from local folder
+# ----------------------------
+
+LOCAL_FONTS_DIR="./fonts"
+
+if [[ -d "$LOCAL_FONTS_DIR" ]]; then
+    echo "📂 Importing all fonts from $LOCAL_FONTS_DIR ..."
+    mkdir -p /usr/local/share/fonts/custom
+    cp -v "$LOCAL_FONTS_DIR"/*.{ttf,otf,ttc} /usr/local/share/fonts/custom/ 2>/dev/null || true
+    fc-cache -f
+    echo "✅ Local fonts imported successfully!"
+else
+    echo "⚠️ WARNING: Fonts folder $LOCAL_FONTS_DIR not found. Skipping local fonts import."
+fi
+
+
 # Install Google Fonts
 
 sudo apt update && sudo apt install fonts-roboto fonts-open-sans fonts-lato fonts-montserrat fonts-inter fonts-noto-core fonts-noto-ui-core fonts-dejavu fonts-freefont-ttf
