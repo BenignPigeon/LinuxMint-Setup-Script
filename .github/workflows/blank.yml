@@ -13,34 +13,17 @@ jobs:
       # Checkout the repo
       - uses: actions/checkout@v4
 
-      # Set up Node.js (or whatever runtime/build you need)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      # Install dependencies (if needed)
-      - name: Install dependencies
-        run: npm install
-
-      # Build the project
-      - name: Build project
-        run: |
-          npm run build
-
-      # Zip the build output
+      # Zip the repository
       - name: Create ZIP
-        run: |
-          zip -r project.zip ./dist
+        run: zip -r LinuxMint-Setup-Script.zip ./*
 
       # Determine the next beta version
       - name: Determine next beta version
         id: version
         run: |
-          # Get current tag (assumes tags like v1.0.0 or v1.0.0-beta.x)
-          latest=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$' | head -n1)
+          latest=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$' | head -n1 || echo "v0.0.0")
           echo "Latest tag: $latest"
-          
+
           if [[ $latest == *"-beta."* ]]; then
             base=${latest%-beta.*}
             beta_num=${latest##*-beta.}
@@ -69,6 +52,6 @@ jobs:
       - name: Upload ZIP to release
         uses: softprops/action-gh-release@v1
         with:
-          files: project.zip
+          files: LinuxMint-Setup-Script.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
