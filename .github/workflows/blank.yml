@@ -1,0 +1,74 @@
+name: Build & Beta Release
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repo
+      - uses: actions/checkout@v4
+
+      # Set up Node.js (or whatever runtime/build you need)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Install dependencies (if needed)
+      - name: Install dependencies
+        run: npm install
+
+      # Build the project
+      - name: Build project
+        run: |
+          npm run build
+
+      # Zip the build output
+      - name: Create ZIP
+        run: |
+          zip -r project.zip ./dist
+
+      # Determine the next beta version
+      - name: Determine next beta version
+        id: version
+        run: |
+          # Get current tag (assumes tags like v1.0.0 or v1.0.0-beta.x)
+          latest=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-beta\.[0-9]+)?$' | head -n1)
+          echo "Latest tag: $latest"
+          
+          if [[ $latest == *"-beta."* ]]; then
+            base=${latest%-beta.*}
+            beta_num=${latest##*-beta.}
+            next_beta=$((beta_num+1))
+          else
+            base=$latest
+            next_beta=1
+          fi
+
+          next_tag="${base}-beta.${next_beta}"
+          echo "Next beta tag: $next_tag"
+          echo "next_tag=$next_tag" >> $GITHUB_OUTPUT
+
+      # Create GitHub pre-release
+      - name: Create GitHub pre-release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.next_tag }}
+          name: ${{ steps.version.outputs.next_tag }}
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload ZIP to the release
+      - name: Upload ZIP to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: project.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
