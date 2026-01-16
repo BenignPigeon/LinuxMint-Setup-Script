@@ -21,7 +21,8 @@ echo "🚀 Starting font installation (Unattended Mode)..."
 # Import fonts from local folder
 # ----------------------------
 
-LOCAL_FONTS_DIR="./fonts"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
+LOCAL_FONTS_DIR="$SCRIPT_DIR/fonts"
 
 if [[ -d "$LOCAL_FONTS_DIR" ]]; then
     echo "📂 Importing all fonts from $LOCAL_FONTS_DIR ..."
@@ -32,6 +33,7 @@ if [[ -d "$LOCAL_FONTS_DIR" ]]; then
 else
     echo "⚠️ WARNING: Fonts folder $LOCAL_FONTS_DIR not found. Skipping local fonts import."
 fi
+
 
 
 # Install Google Fonts
