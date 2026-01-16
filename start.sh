@@ -13,14 +13,14 @@ fi
 
 # 2. Define Jobs: "Display Name | Script Path"
 JOBS=(
-    # "System Update and Backup|bin/1st-backup.sh"
     "Multimedia Codec Install|bin/codec-check.sh"
     "Firewall Setup|bin/firewall.sh"
     "Background and Themes|background.sh"
     "Microsoft and Google Font Setup|bin/fonts.sh"
-    # "Resolution and Scaling|bin/scaling.sh"
     "Disable Touchpad while Typing|bin/disable-touchpad-while-typing.sh"
     "App Installs|app-install.sh"
+    # "System Update and Backup|bin/1st-backup.sh"
+    # "Resolution and Scaling|bin/scaling.sh"
     # "Test|bin/test1.sh"
 )
 
