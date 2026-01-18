@@ -15,7 +15,7 @@ fi
 JOBS=(
     "Multimedia Codec Install|bin/codec-check.sh"
     "Firewall Setup|bin/firewall.sh"
-    "Background and Themes|background.sh"
+    "Background and Themes|bin/background.sh"
     "Microsoft and Google Font Setup|bin/fonts.sh"
     "Disable Touchpad while Typing|bin/disable-touchpad-while-typing.sh"
     "App Installs|app-install.sh"
