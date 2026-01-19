@@ -10,18 +10,11 @@ curl -sSL https://gist.githubusercontent.com/BenignPigeon/64cde9ef0cf255a56d0d76
 ```
 
 ### 🛠️ Manual Alternative
-Use this method if you prefer to download and extract the release files into a temporary directory before running.
-
+1. Download the source code from the main branch.
+2. Unzip the folder
+3. Open the terminal and type
 ```bash
-mkdir -p /tmp/mint-setup && \
-curl -s https://api.github.com/repos/BenignPigeon/LinuxMint-Setup-Script/releases/latest \
-| grep "browser_download_url.*zip" \
-| cut -d : -f 2,3 \
-| tr -d \" \
-| wget -qi - -O /tmp/mint-setup/latest.zip && \
-unzip -o /tmp/mint-setup/latest.zip -d /tmp/mint-setup && \
-cd /tmp/mint-setup && \
-sudo bash start.sh
+sudo bash /path/to/start.sh
 ```
 
 ## 🛠 Features
