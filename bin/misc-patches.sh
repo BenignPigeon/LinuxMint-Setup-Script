@@ -14,6 +14,10 @@ sudo -u "$REAL_USER" \
     # Desktop: show home and bin icons
     gsettings set org.nemo.desktop home-icon-visible true
     gsettings set org.nemo.desktop trash-icon-visible true
+
+    # Set Notepad to light theme
+    gsettings set org.x.editor.preferences.editor scheme 'kate'
+    
 EOF
 
 echo "✅ All UI settings applied."
