@@ -11,11 +11,29 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# 1. Close LibreOffice if it is running
-if pgrep -x "soffice.bin" > /dev/null; then
-    echo "📨 Closing active LibreOffice instances..."
-    pkill -u "$SUDO_USER" -x "soffice.bin" || true
-    # Give the system a moment to release file locks
+# ================================================================
+# CONFIGURATION: ADD MORE APPS HERE
+# ================================================================
+# Add the process names (what you see in 'pgrep' or 'top') to this list.
+# Example: APPS_TO_CLOSE=("soffice.bin" "albert" "firefox" "discord")
+APPS_TO_CLOSE=(
+    "soffice.bin"   # LibreOffice
+    "albert"        # Albert Launcher
+)
+# ================================================================
+
+# 1. Close active instances of apps in the list
+echo "📨 Checking for active applications..."
+for APP in "${APPS_TO_CLOSE[@]}"; do
+    if pgrep -x "$APP" > /dev/null; then
+        echo "   -> Closing $APP..."
+        pkill -u "$SUDO_USER" -x "$APP" || true
+        NEED_SLEEP=true
+    fi
+done
+
+# Give the system a moment to release file locks only if we actually closed something
+if [ "$NEED_SLEEP" = true ]; then
     sleep 2
 fi
 
@@ -52,8 +70,6 @@ for item in "$SOURCE_CONFIG_DIR"/*; do
 done
 
 # 6. Fix Permissions
-# Since the script ran as sudo, files are currently owned by root.
-# This changes them back to the actual user.
 echo "🔧 Adjusting permissions for $REAL_USER..."
 chown -R "$REAL_USER:$REAL_USER" "$TARGET_CONFIG_DIR"
 
