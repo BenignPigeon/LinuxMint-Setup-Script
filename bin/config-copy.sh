@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------
+# Script: setup_configs.sh
+# Purpose: Sync ./bin/config to ~/.config/ and fix permissions
+# ----------------------------------------------------------------
+
+# 0. Ensure the script is run with sudo
+if [[ $EUID -ne 0 ]]; then
+   echo "❌ ERROR: This script must be run with sudo."
+   exit 1
+fi
+
+# 1. Close LibreOffice if it is running
+if pgrep -x "soffice.bin" > /dev/null; then
+    echo "📨 Closing active LibreOffice instances..."
+    pkill -u "$SUDO_USER" -x "soffice.bin" || true
+    # Give the system a moment to release file locks
+    sleep 2
+fi
+
+# 2. Identify the actual user (not root)
+REAL_USER=$SUDO_USER
+USER_HOME=$(getent passwd "$REAL_USER" | cut -d: -f6)
+TARGET_CONFIG_DIR="$USER_HOME/.config"
+
+# 3. Define the source directory
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &>/dev/null && pwd )"
+SOURCE_CONFIG_DIR="$SCRIPT_DIR/config"
+
+echo "🚀 Starting configuration sync for user: $REAL_USER"
+
+# 4. Check if source directory exists
+if [ ! -d "$SOURCE_CONFIG_DIR" ]; then
+    echo "❌ ERROR: Source directory $SOURCE_CONFIG_DIR not found!"
+    exit 1
+fi
+
+# 5. Copy folders
+# We loop through each item in ./bin/config/ to replace folders individually
+for item in "$SOURCE_CONFIG_DIR"/*; do
+    if [ -d "$item" ]; then
+        folder_name=$(basename "$item")
+        echo "📂 Syncing: $folder_name"
+        
+        # Remove existing folder in .config to ensure a clean replacement
+        rm -rf "$TARGET_CONFIG_DIR/$folder_name"
+        
+        # Copy the new folder
+        cp -r "$item" "$TARGET_CONFIG_DIR/"
+    fi
+done
+
+# 6. Fix Permissions
+# Since the script ran as sudo, files are currently owned by root.
+# This changes them back to the actual user.
+echo "🔧 Adjusting permissions for $REAL_USER..."
+chown -R "$REAL_USER:$REAL_USER" "$TARGET_CONFIG_DIR"
+
+echo "------------------------------------------------"
+echo "✅ SUCCESS: Configs updated in $TARGET_CONFIG_DIR"
+echo "------------------------------------------------"

@@ -19,6 +19,7 @@ JOBS=(
     "Microsoft and Google Font Setup|bin/fonts.sh"
     "Disable Touchpad while Typing|bin/disable-touchpad-while-typing.sh"
     "App Installs|bin/app-install.sh"
+    "Load Configs|bin/config-copy.sh"
     "Miscellaneous|bin/misc-patches.sh"
     # "System Update and Backup|bin/1st-backup.sh"
     # "Resolution and Scaling|bin/scaling.sh"
