@@ -69,7 +69,21 @@ for item in "$SOURCE_CONFIG_DIR"/*; do
     fi
 done
 
-# 6. Fix Permissions
+# 6. Alter Albert Contents - Update to make this pseudocode actually work
+if exist "$TARGET_CONFIG_DIR/albert" , search for line starting with "[Files]" and under paste the following directly under:
+"""
+enabled=true
+home\ben\followSymlinks=false
+home\ben\indexhidden=false
+home\ben\maxDepth=255
+home\ben\mimeFilters=inode/directory, image/*, video/*, audio/*, inode/*, application/*, message/*, model/*, multipart/*, text/*, x-content/*, x-epoc/*
+home\ben\nameFilters=@Invalid()
+home\ben\scanInterval=5
+home\ben\useFileSystemWatches=false
+paths=/home/ben #update /home/ben with $USER_HOME and home/ben with like home/$REAL_USER or something equivalent so it works on all linux mint systems
+"""
+
+# 7. Fix Permissions
 echo "🔧 Adjusting permissions for $REAL_USER..."
 chown -R "$REAL_USER:$REAL_USER" "$TARGET_CONFIG_DIR"
 
