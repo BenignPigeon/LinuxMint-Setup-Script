@@ -69,19 +69,34 @@ for item in "$SOURCE_CONFIG_DIR"/*; do
     fi
 done
 
-# # 6. Alter Albert Contents - Update to make this pseudocode actually work
-# if exist "$TARGET_CONFIG_DIR/albert" , search for line starting with "[Files]" and under paste the following directly under:
-# """
-# enabled=true
-# home\ben\followSymlinks=false
-# home\ben\indexhidden=false
-# home\ben\maxDepth=255
-# home\ben\mimeFilters=inode/directory, image/*, video/*, audio/*, inode/*, application/*, message/*, model/*, multipart/*, text/*, x-content/*, x-epoc/*
-# home\ben\nameFilters=@Invalid()
-# home\ben\scanInterval=5
-# home\ben\useFileSystemWatches=false
-# paths=/home/ben #update /home/ben with $USER_HOME and home/ben with like home/$REAL_USER or something equivalent so it works on all linux mint systems
-# """
+# 6. Alter Albert Contents
+ALBERT_CONFIG="$TARGET_CONFIG_DIR/albert/config"
+
+if [ -f "$ALBERT_CONFIG" ]; then
+    echo "✏️ Updating Albert config..."
+
+    # Prepare the block with correct paths (no backslashes)
+    ALBERT_BLOCK=$(cat <<EOM
+enabled=true
+home/$REAL_USER/followSymlinks=false
+home/$REAL_USER/indexhidden=false
+home/$REAL_USER/maxDepth=255
+home/$REAL_USER/mimeFilters=inode/directory, image/*, video/*, audio/*, inode/*, application/*, message/*, model/*, multipart/*, text/*, x-content/*, x-epoc/*
+home/$REAL_USER/nameFilters=@Invalid()
+home/$REAL_USER/scanInterval=5
+home/$REAL_USER/useFileSystemWatches=false
+paths=$USER_HOME
+EOM
+)
+    # Insert the block after the [files] section (case-insensitive)
+    awk -v block="$ALBERT_BLOCK" 'BEGIN{IGNORECASE=1} /^\[files\]/{print; print block; next} {print}' "$ALBERT_CONFIG" > "$ALBERT_CONFIG.tmp" \
+        && mv "$ALBERT_CONFIG.tmp" "$ALBERT_CONFIG"
+
+    echo "✅ Albert config updated successfully."
+else
+    echo "⚠️ Albert config not found at $ALBERT_CONFIG, skipping..."
+fi
+
 
 # 7. Fix Permissions
 echo "🔧 Adjusting permissions for $REAL_USER..."
