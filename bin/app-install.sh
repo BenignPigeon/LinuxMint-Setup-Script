@@ -1,6 +1,16 @@
-# 1. Install Albert
+# 1. Check if jq is installed, install if not
+if ! command -v jq &> /dev/null; then
+    echo "jq not found, installing..."
+    sudo apt update && sudo apt install -y jq
+    echo "✅ jq installed successfully!"
+else
+    echo "ℹ️ jq is already installed. Skipping installation."
+fi
+
+
+# 2. Install Albert
 if ! command -v albert &> /dev/null; then
-    echo "Albert not found. Installing for Mint 22 (Noble)..."
+    echo "Albert not found, installing..."
     REPO_URL="https://download.opensuse.org/repositories/home:/manuelschneid3r/xUbuntu_24.04"
 
     curl -fsSL "${REPO_URL}/Release.key" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/albert.gpg > /dev/null
@@ -17,21 +27,12 @@ else
     echo "ℹ️ Albert is already installed. Skipping installation."
 fi
 
-# 4. Install JQ
+# -------------------------------------------------------------------------
+# Alter pinned apps
 
-sudo apt update && sudo apt install jq -y
+sudo bash ./bin/pin-app.sh libreoffice-writer.desktop
 
-# 3. Install Librewolf
-sudo apt update && sudo apt install extrepo -y
-
-sudo extrepo enable librewolf
-
-sudo apt update && sudo apt install librewolf -y
-
-echo "==> LibreWolf installed."
-
-sudo bash ./bin/pin-app.sh librewolf.desktop
-sudo bash ./bin/pin-app.sh -r firefox.desktop
+# sudo bash ./bin/pin-app.sh -r firefox.desktop
 
 # Reload Cinnamon panel for that user
 sudo -u "$SUDO_USER" DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u $SUDO_USER)/bus" cinnamon-dbus-command RestartCinnamon 1
