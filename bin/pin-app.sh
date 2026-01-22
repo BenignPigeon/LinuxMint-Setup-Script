@@ -35,13 +35,13 @@ for CONFIG in "${CONFIGS[@]}"; do
     chown "$REAL_USER":"$REAL_USER" "$CONFIG"
 done
 
-# # 5. FORCE UI REFRESH
-# # We tell Cinnamon to reload the applet. This is the equivalent of 
-# # right-clicking the panel and hitting 'Reload'.
-# echo "Refreshing Cinnamon Panel..."
-# sudo -u "$REAL_USER" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDRESS" \
-#     dbus-send --type=method_call --dest=org.Cinnamon \
-#     /org/Cinnamon org.Cinnamon.ReloadSpice \
-#     string:"$APPLET_ID" string:"applet"
+# 5. FORCE UI REFRESH
+# We tell Cinnamon to reload the applet. This is the equivalent of 
+# right-clicking the panel and hitting 'Reload'.
+echo "Refreshing Cinnamon Panel..."
+sudo -u "$REAL_USER" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDRESS" \
+    dbus-send --type=method_call --dest=org.Cinnamon \
+    /org/Cinnamon org.Cinnamon.ReloadSpice \
+    string:"$APPLET_ID" string:"applet"
 
-# echo "Done! $APP should now be visible on the taskbar."
+echo "Done! $APP should now be visible on the taskbar."
