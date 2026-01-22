@@ -17,6 +17,25 @@ else
     echo "ℹ️ Albert is already installed. Skipping installation."
 fi
 
+# 4. Install JQ
+
+sudo apt update && sudo apt install jq -y
+
+# 3. Install Librewolf
+sudo apt update && sudo apt install extrepo -y
+
+sudo extrepo enable librewolf
+
+sudo apt update && sudo apt install librewolf -y
+
+echo "==> LibreWolf installed."
+
+sudo bash ./bin/pin-app.sh librewolf.desktop
+sudo bash ./bin/pin-app.sh -r firefox.desktop
+
+# Reload Cinnamon panel for that user
+sudo -u "$SUDO_USER" DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u $SUDO_USER)/bus" cinnamon-dbus-command RestartCinnamon 1
+
 echo "-----------------------------------------------"
 echo "✅ SUCCESS: All apps installed successfully!"
 echo "-----------------------------------------------"
