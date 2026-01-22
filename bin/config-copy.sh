@@ -102,6 +102,9 @@ fi
 echo "🔧 Adjusting permissions for $REAL_USER..."
 chown -R "$REAL_USER:$REAL_USER" "$TARGET_CONFIG_DIR"
 
+# 8. Run Firefox Config Script
+sudo bash ./bin/firefox-config.sh
+
 echo "------------------------------------------------"
 echo "✅ SUCCESS: Configs updated in $TARGET_CONFIG_DIR"
 echo "------------------------------------------------"
