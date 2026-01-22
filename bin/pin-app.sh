@@ -36,8 +36,6 @@ for CONFIG in "${CONFIGS[@]}"; do
 done
 
 # 5. FORCE UI REFRESH
-# We tell Cinnamon to reload the applet. This is the equivalent of 
-# right-clicking the panel and hitting 'Reload'.
 echo "Refreshing Cinnamon Panel..."
 sudo -u "$REAL_USER" DBUS_SESSION_BUS_ADDRESS="$DBUS_ADDRESS" \
     dbus-send --type=method_call --dest=org.Cinnamon \
