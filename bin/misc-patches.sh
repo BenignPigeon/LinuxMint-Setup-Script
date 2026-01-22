@@ -19,10 +19,10 @@ sudo -u "$REAL_USER" \
     gsettings set org.x.editor.preferences.editor scheme 'kate'
 
     # Start Albert
-    # nohup albert >/dev/null 2>&1 &
+    nohup albert >/dev/null 2>&1 &
 
     # Make Albert run at startup
-    # mkdir -p ~/.config/autostart && printf "[Desktop Entry]\nType=Application\nName=Albert\nExec=albert\nX-GNOME-Autostart-enabled=true\n" > ~/.config/autostart/albert.desktop
+    mkdir -p ~/.config/autostart && printf "[Desktop Entry]\nType=Application\nName=Albert\nExec=albert\nX-GNOME-Autostart-enabled=true\n" > ~/.config/autostart/albert.desktop
 EOF
 
 echo "✅ All UI settings applied."
