@@ -25,7 +25,15 @@ fi
 
 # 4. Handle profiles.ini Logic
 if [ ! -f "$INI_FILE" ]; then
-    sudo chown -R $USER:$USER ~/.mozilla && firefox --headless &
+LOGIN_USER=$(logname)
+USER_ID=$(id -u "$LOGIN_USER")
+
+sudo -u "$LOGIN_USER" \
+  DISPLAY=:0 \
+  XAUTHORITY="/home/$LOGIN_USER/.Xauthority" \
+  XDG_RUNTIME_DIR="/run/user/$USER_ID" \
+  firefox &
+
     sleep 5
     pkill -9 firefox 2>/dev/null
 else
