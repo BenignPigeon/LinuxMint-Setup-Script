@@ -20,6 +20,7 @@ JOBS=(
     "Disable Touchpad while Typing|bin/disable-touchpad-while-typing.sh"
     "App Installs|bin/app-install.sh"
     "Load Configs|bin/config-copy.sh"
+    "Firefox Config|bin/firefox-config.sh"
     "Miscellaneous|bin/misc-patches.sh"
     # "System Update and Backup|bin/1st-backup.sh"
     # "Resolution and Scaling|bin/scaling.sh"
