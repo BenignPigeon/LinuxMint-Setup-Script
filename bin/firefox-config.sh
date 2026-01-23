@@ -33,6 +33,8 @@ else
 fi
 
 # Continue install script
+rm "$FF_DIR/installs.ini"
+
 echo "Updating existing profiles.ini..."
 
 NEXT_NUM=$(grep -c "^\[Profile" "$INI_FILE")
