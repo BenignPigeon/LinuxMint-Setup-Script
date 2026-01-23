@@ -25,7 +25,7 @@ fi
 
 # 4. Handle profiles.ini Logic
 if [ ! -f "$INI_FILE" ]; then
-    sudo -u "$REAL_USER" firefox --headless --first-startup &
+    sudo chown -R $USER:$USER ~/.mozilla && firefox --headless &
     sleep 5
     pkill -9 firefox 2>/dev/null
 else
