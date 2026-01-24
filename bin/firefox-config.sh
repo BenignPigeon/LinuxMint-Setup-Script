@@ -13,17 +13,8 @@ PROFILE_NAME="good1.default-release"
 # 2. Kill Firefox
 pkill -9 firefox 2>/dev/null
 
-# 3. Ensure Directory & Copy
-mkdir -p "$FF_DIR"
-if [ -d "$SRC_PROFILE" ]; then
-    cp -r "$SRC_PROFILE" "$FF_DIR/"
-    chown -R "$REAL_USER":"$REAL_USER" "$FF_DIR/$PROFILE_NAME"
-else
-    echo "Error: Source profile not found."
-    exit 1
-fi
 
-# 4. Handle profiles.ini Logic
+# 3. Handle profiles.ini Logic
 if [ ! -f "$INI_FILE" ]; then
 LOGIN_USER=$(logname)
 USER_ID=$(id -u "$LOGIN_USER")
@@ -40,7 +31,16 @@ else
     echo "already existed, continuing..."
 fi
 
-# Continue install script
+# 4. Ensure Directory & Copy
+mkdir -p "$FF_DIR"
+if [ -d "$SRC_PROFILE" ]; then
+    cp -r "$SRC_PROFILE" "$FF_DIR/"
+    chown -R "$REAL_USER":"$REAL_USER" "$FF_DIR/$PROFILE_NAME"
+else
+    echo "Error: Source profile not found."
+    exit 1
+fi
+
 rm "$FF_DIR/installs.ini"
 
 echo "Updating existing profiles.ini..."
