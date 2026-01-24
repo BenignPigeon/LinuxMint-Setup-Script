@@ -47,3 +47,48 @@ run_as_user set org.cinnamon.desktop.wm.preferences theme "Mint-Y-Dark-Blue"
 run_as_user set org.cinnamon.desktop.interface gtk-theme "Mint-Y-Dark-Blue"
 run_as_user set org.cinnamon.desktop.interface icon-theme "Mint-Y-Blue"
 run_as_user set org.cinnamon.theme name "Mint-Y-Dark-Blue"
+
+# 7. Update LightDM (login screen) theme and wallpaper
+SYSTEM_BG="/usr/share/backgrounds/linuxmint-wallpapers/mfakurian_abstract.jpg"
+LIGHTDM_CONF="/etc/lightdm/slick-greeter.conf"
+
+echo "Checking LightDM login screen configuration..."
+
+# Ensure the config file exists
+if [ ! -f "$LIGHTDM_CONF" ]; then
+    sudo mkdir -p /etc/lightdm
+    echo -e "[Greeter]" | sudo tee "$LIGHTDM_CONF" >/dev/null
+fi
+
+# 1. Logic Check: Only proceed if background is a generic default or empty
+CURRENT_LIGHTDM_BG=$(grep "^background=" "$LIGHTDM_CONF" | cut -d'=' -f2)
+
+if [[ "$CURRENT_LIGHTDM_BG" == *"/usr/share/backgrounds/linuxmint/default"* ]] || [[ -z "$CURRENT_LIGHTDM_BG" ]]; then
+    
+    # Extra safety: Check if the file actually exists before applying
+    if [ -f "$SYSTEM_BG" ]; then
+        echo "Default LightDM background detected. Syncing themes..."
+
+        # Helper function to update or append keys under [Greeter]
+        update_lightdm_setting() {
+            local key=$1
+            local value=$2
+            if grep -q "^$key=" "$LIGHTDM_CONF"; then
+                sudo sed -i "s|^$key=.*|$key=$value|" "$LIGHTDM_CONF"
+            else
+                sudo sed -i "/\[Greeter\]/a $key=$value" "$LIGHTDM_CONF"
+            fi
+        }
+
+        update_lightdm_setting "background" "$SYSTEM_BG"
+        update_lightdm_setting "icon-theme-name" "Mint-Y-Blue"
+        update_lightdm_setting "theme-name" "Mint-Y-Dark-Blue"
+        update_lightdm_setting "cursor-theme-name" "Bibata-Modern-Classic"
+
+        echo "✅ LightDM visuals updated to match system theme."
+    else
+        echo "❌ Error: $SYSTEM_BG not found. Skipping LightDM update."
+    fi
+else
+    echo "⚠️ Custom LightDM background already set. Skipping."
+fi
