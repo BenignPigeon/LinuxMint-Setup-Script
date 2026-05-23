@@ -28,6 +28,12 @@ else
 fi
 
 # -------------------------------------------------------------------------
+# Thunderbird Tweak
+
+sudo apt purge thunderbird -y && sudo apt autoremove -y && \
+flatpak install -y flathub org.mozilla.Thunderbird 
+
+# -------------------------------------------------------------------------
 # Alter pinned apps
 
 sudo bash ./bin/pin-app.sh libreoffice-writer.desktop
