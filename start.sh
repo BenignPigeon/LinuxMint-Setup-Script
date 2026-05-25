@@ -76,6 +76,24 @@ run_script() {
     local full_path="$SCRIPT_DIR/$script_rel_path"
 
     clear
+
+    echo -e "  ${DIM}┌── Output ────────────────────────────────────┐${NC}"
+    if [[ " ${args[*]} " == *" -test "* ]]; then
+        echo -e "${BG_BLUE}${FG_BLACK}${BOLD} LINUX AUTOMATION TOOL ${NC}${BG_MAGENTA}${FG_BLACK} ${NC}"
+        echo
+        echo -e "  │ ${YELLOW}🧪 TEST MODE: Skipping all scripts and exiting.${NC}"
+        echo -e "  ${DIM}└──────────────────────────────────────────────┘${NC}"
+        exit 0
+    elif [ -f "$full_path" ]; then
+        bash "$full_path" "${args[@]}" 2>&1 | sed 's/^/  │ /'
+        status=${PIPESTATUS[0]}
+    else
+        echo -e "  │ ${RED}Error: File not found at ${full_path}${NC}"
+        status=1
+    fi
+
+    echo -e "  ${DIM}└──────────────────────────────────────────────┘${NC}"
+
     echo -e "${BG_BLUE}${FG_BLACK}${BOLD} LINUX AUTOMATION TOOL ${NC}${BG_MAGENTA}${FG_BLACK} ${step} ${NC}"
     echo -e "${CYAN}${DIM}──────────────────────────────────────────────────${NC}"
     echo
@@ -94,19 +112,6 @@ run_script() {
     echo
 
 
-    echo -e "  ${DIM}┌── Output ────────────────────────────────────┐${NC}"
-    if [[ " ${args[*]} " == *" -test "* ]]; then
-        echo -e "  │ ${YELLOW}🧪 TEST MODE: ${display_name} skipped successfully${NC}"
-        status=0
-    elif [ -f "$full_path" ]; then
-        bash "$full_path" "${args[@]}" 2>&1 | sed 's/^/  │ /'
-        status=${PIPESTATUS[0]}
-    else
-        echo -e "  │ ${RED}Error: File not found at ${full_path}${NC}"
-        status=1
-    fi
-    
-    echo -e "  ${DIM}└──────────────────────────────────────────────┘${NC}"
 
     if [ $status -eq 0 ]; then
         COMPLETED+=("${GREEN}${ICON_CHECK}${NC} ${DIM}[${step}]${NC} ${display_name}")
