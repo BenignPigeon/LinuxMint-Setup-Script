@@ -27,6 +27,14 @@ JOBS=(
     # "Test|bin/test1.sh"
 )
 
+# If run in full mode (-f / -full)
+if [[ " $* " == *" -full "* ]] || [[ " $* " == *" -f "* ]]; then
+    for f in "$SCRIPT_DIR/bin/full/"*.sh; do
+        [ -f "$f" ] || continue
+        JOBS+=("$(basename "$f" .sh)|bin/full/$(basename "$f")")
+    done
+fi
+
 # Color Palette
 BG_BLUE='\033[44m'; BG_MAGENTA='\033[45m'; BG_GREEN='\033[42m'; BG_RED='\033[41m'
 FG_BLACK='\033[30m'; CYAN='\033[0;36m'; BLUE='\033[0;34m'; GREEN='\033[0;32m'
