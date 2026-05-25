@@ -1,61 +1,79 @@
 #!/bin/bash
 
-# --- 1. Disable Airplane Mode Key FIRST (Framework Hardware Rule) ---
-# We do this first because triggering udev resets Cinnamon's keymap.
+# --- 1. Disable Airplane Mode Key (Framework Hardware Rule) ---
 UDEV_FILE="/etc/udev/hwdb.d/99-no-airplane-mode.hwdb"
-
 echo "Creating hwdb rule for Framework Airplane Mode key..."
 sudo tee "$UDEV_FILE" > /dev/null <<'EOF'
 evdev:input:b0018v32ACp0006*
  KEYBOARD_KEY_100c6=reserved
 EOF
-
-echo "Updating hardware database..."
 sudo systemd-hwdb update
-
-echo "Triggering udev system (this causes Mint to reset your keymap)..."
+echo "Triggering udev..."
 sudo udevadm trigger
-
-# --- 2. Pause Briefly ---
-# Give the system and Cinnamon a second to process the hardware trigger
-echo "Waiting for background keyboard daemons to settle..."
 sleep 1.5
 
-# --- 3. Install xmodmap (Linux Mint / APT) ---
-if ! command -v xmodmap &> /dev/null; then
-    echo "xmodmap not found. Installing via apt..."
-    sudo apt-get update && sudo apt-get install -y x11-xserver-utils
-else
-    echo "✓ xmodmap is already verified."
-fi
-
-# --- 4. Create / Update local .Xmodmap file ---
-echo "Configuring F11/F12 rebinds..."
+# --- 2. Write the xmodmap ---
 XMODMAP_FILE="$HOME/.Xmodmap"
-
-cat << 'EOF' > "$XMODMAP_FILE"
+cat > "$XMODMAP_FILE" <<'EOF'
 keycode 107 = Home
 keycode 234 = End
 EOF
+echo "✓ Written ~/.Xmodmap"
 
-# --- 5. Apply xmodmap NOW (Now that udev is finished) ---
-xmodmap "$XMODMAP_FILE"
-echo "✓ F11/F12 successfully rebound for this active session."
+# --- 3. Fix the xkb symbols file ---
+sudo tee /usr/share/X11/xkb/symbols/framework_keys > /dev/null <<'EOF'
+partial alphanumeric_keys
+xkb_symbols "framework" {
+    key <PRSC> { [ Home ] };
+    key <I234> { [ End  ] };
+};
+EOF
+echo "✓ Written xkb symbols file"
 
-# --- 6. Make xmodmap load automatically on future boots ---
-STARTUP_DIR="$HOME/.config/autostart"
-mkdir -p "$STARTUP_DIR"
+# --- 4. Write the apply script (xmodmap only, clean and simple) ---
+APPLY_SCRIPT="$HOME/.local/bin/apply-framework-keys.sh"
+mkdir -p "$HOME/.local/bin"
+cat > "$APPLY_SCRIPT" <<'SCRIPT'
+#!/bin/bash
+xmodmap "$HOME/.Xmodmap"
+SCRIPT
+chmod +x "$APPLY_SCRIPT"
+echo "✓ Written apply script"
 
-cat << EOF > "$STARTUP_DIR/xmodmap-remap.desktop"
-[Desktop Entry]
-Type=Application
-Exec=xmodmap $HOME/.Xmodmap
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Name=Custom Key Remap
-Comment=Loads custom Home/End binds for F11/F12 on login
+# --- 5. Remove old .desktop autostart if present ---
+DESKTOP_FILE="$HOME/.config/autostart/framework-keys.desktop"
+if [ -f "$DESKTOP_FILE" ]; then
+    rm "$DESKTOP_FILE"
+    echo "✓ Removed old .desktop autostart"
+fi
+
+# --- 6. Install systemd user service ---
+mkdir -p "$HOME/.config/systemd/user"
+cat > "$HOME/.config/systemd/user/framework-keys.service" <<EOF
+[Unit]
+Description=Framework Key Remap
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 8
+ExecStart=${HOME}/.local/bin/apply-framework-keys.sh
+Environment=DISPLAY=:0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=graphical-session.target
 EOF
 
-echo "✓ Added xmodmap execution to Linux Mint Startup Applications."
-echo "--------------------------------------------------"
+systemctl --user daemon-reload
+systemctl --user enable framework-keys.service
+echo "✓ Systemd user service enabled"
+
+# --- 7. Apply right now in the current session ---
+xmodmap "$XMODMAP_FILE"
+echo "✓ Applied to current session."
+
+echo ""
+echo "All done. Reboot to confirm persistence."
+echo "After reboot, verify with: systemctl --user status framework-keys.service"

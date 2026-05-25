@@ -28,7 +28,7 @@ else
 fi
 
 # -------------------------------------------------------------------------
-# Thunderbird Tweak
+# 3. Thunderbird Tweak
 
 sudo apt purge thunderbird -y && sudo apt autoremove -y && \
 flatpak install -y flathub org.mozilla.Thunderbird 
@@ -37,8 +37,12 @@ flatpak install -y flathub org.mozilla.Thunderbird
 # Alter pinned apps
 
 sudo bash ./bin/pin-app.sh libreoffice-writer.desktop
+sudo bash ./bin/pin-app.sh  org.mozilla.Thunderbird.desktop
 
 # sudo bash ./bin/pin-app.sh -r firefox.desktop
+
+# to search:
+# grep -i "thunderbird" /usr/share/applications/*.desktop ~/.local/share/applications/*.desktop 2>/dev/null
 
 # Reload Cinnamon panel for that user
 sudo -u "$SUDO_USER" DISPLAY=:0 DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u $SUDO_USER)/bus" cinnamon-dbus-command RestartCinnamon 1

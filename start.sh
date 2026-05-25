@@ -68,6 +68,8 @@ FAIL_COUNT=0
 run_script() {
     local index=$1
     local entry=$2
+    shift 2
+    local args=("$@")
     local display_name="${entry%%|*}"
     local script_rel_path="${entry##*|}"
     local step="$((index + 1))/$TOTAL"
@@ -93,13 +95,17 @@ run_script() {
 
 
     echo -e "  ${DIM}┌── Output ────────────────────────────────────┐${NC}"
-    if [ -f "$full_path" ]; then
-        bash "$full_path" 2>&1 | sed 's/^/  │ /'
+    if [[ " ${args[*]} " == *" -test "* ]]; then
+        echo -e "  │ ${YELLOW}🧪 TEST MODE: ${display_name} skipped successfully${NC}"
+        status=0
+    elif [ -f "$full_path" ]; then
+        bash "$full_path" "${args[@]}" 2>&1 | sed 's/^/  │ /'
         status=${PIPESTATUS[0]}
     else
         echo -e "  │ ${RED}Error: File not found at ${full_path}${NC}"
         status=1
     fi
+    
     echo -e "  ${DIM}└──────────────────────────────────────────────┘${NC}"
 
     if [ $status -eq 0 ]; then
@@ -111,7 +117,7 @@ run_script() {
 }
 
 for i in "${!JOBS[@]}"; do
-    run_script "$i" "${JOBS[$i]}"
+    run_script "$i" "${JOBS[$i]}" "$@"
 done
 
 clear
