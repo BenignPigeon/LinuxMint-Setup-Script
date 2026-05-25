@@ -23,6 +23,9 @@ sudo -u "$REAL_USER" \
 
     # Make Albert run at startup
     mkdir -p ~/.config/autostart && printf "[Desktop Entry]\nType=Application\nName=Albert\nExec=albert\nX-GNOME-Autostart-enabled=true\n" > ~/.config/autostart/albert.desktop
+
+    sed -i 's/%A, %B %e, %H:%M/%d\/%m\/%y, %H:%M/' ~/.config/cinnamon/spices/calendar@cinnamon.org/13.json
+    cinnamon --replace &
 EOF
 
 echo "✅ All UI settings applied."
