@@ -32,7 +32,10 @@ fi
 
 sudo apt purge thunderbird -y && sudo apt autoremove -y && \
 flatpak install -y flathub org.mozilla.Thunderbird 
+# -------------------------------------------------------------------------
+# 4. Input Remapper
 
+flatpak install -y flathub io.github.sezanzeb.input_remapper
 # -------------------------------------------------------------------------
 # Alter pinned apps
 
