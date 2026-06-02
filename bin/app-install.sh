@@ -39,8 +39,8 @@ flatpak install -y flathub io.github.sezanzeb.input_remapper
 # -------------------------------------------------------------------------
 # Alter pinned apps
 
-sudo bash ./bin/pin-app.sh libreoffice-writer.desktop
 sudo bash ./bin/pin-app.sh  org.mozilla.Thunderbird.desktop
+sudo bash ./bin/pin-app.sh libreoffice-writer.desktop
 
 # sudo bash ./bin/pin-app.sh -r firefox.desktop
 
