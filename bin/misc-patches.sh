@@ -24,6 +24,9 @@ sudo -u "$REAL_USER" \
     # Make Albert run at startup
     mkdir -p ~/.config/autostart && printf "[Desktop Entry]\nType=Application\nName=Albert\nExec=albert\nX-GNOME-Autostart-enabled=true\n" > ~/.config/autostart/albert.desktop
 
+    # Set default mail application
+    xdg-mime default org.mozilla.thunderbird.desktop x-scheme-handler/mailto
+
     sed -i 's/%A, %B %e, %H:%M/%d\/%m\/%y, %H:%M/' ~/.config/cinnamon/spices/calendar@cinnamon.org/13.json
     cinnamon --replace &
 EOF
