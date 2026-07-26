@@ -6,7 +6,7 @@ A lightweight, aesthetic Bash pipeline designed to automate the configuration of
 This method uses a lightweight wrapper to fetch the latest release and run it immediately.
 
 ```bash
-sudo curl -sSL https://gist.githubusercontent.com/BenignPigeon/64cde9ef0cf255a56d0d76c1e0f327b4/raw/linux-mint-setup.sh | bash
+sudo curl -fsSL https://gist.githubusercontent.com/BenignPigeon/c4366353c3c5d47fbe8860de192d2b92/raw/Linux-Mint-Setup-Flags.sh | bash
 ```
 
 ### 🛠️ Manual Alternative
